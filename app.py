@@ -1,39 +1,35 @@
-import os
-from modelos.cardapio.prato import Prato
-from modelos.cardapio.sobremesa import Sobremesa
-from modelos.restaurante import Restaurante
-from modelos.cardapio.bebida import Bebida
+import requests
+import json
 
-restaurante1 = Restaurante('pizza', 'pizza')
-restaurante2 = Restaurante('sushi', 'sushi')
+url = 'https://guilhermeonrails.github.io/api-restaurantes/restaurantes.json'
 
-restaurante1.adicionar_avaliacao('a', 5)
-restaurante1.adicionar_avaliacao('b', 10)
-restaurante1.adicionar_avaliacao('c', 6)
+res = requests.get(url)
 
-restaurante1.alternar_estado()
+if res.status_code == 200:
+    dados = res.json()
+    print(f'Tudo certo: {res.status_code}')
 
-bebida1 = Bebida('suco', 5, 'medio')
-bebida1.aplicar_desconto(0.5)
+    restaurantes = {}
+    for item in dados:
+        company = item['Company']
+        if company not in restaurantes:
+            restaurantes[company] = []
 
-prato1 = Prato('pizza', 10, 'pizza pizza')
-prato1.aplicar_desconto()
+        restaurantes[company].append({
+            "item": item['Item'],
+            "price": item['price'],
+            "description": item['description']
+        })
 
-sobremesa1 = Sobremesa('sorvete', 15, 'sorvete', 'grande')
-sobremesa1.aplicar_desconto()
+else:
+    print(f'O erro foi {res.status_code}')
+    
+# for item in restaurantes['Pizza Hut']:
+#     print('-' * 50)
+#     print(item)
 
-restaurante1.adicionar_item_cardapio(bebida1)
-restaurante1.adicionar_item_cardapio(prato1)
-restaurante1.adicionar_item_cardapio(sobremesa1)
+for company, data in restaurantes.items():
+    file_name = f'{company}.json'
 
-def main():
-    os.system('clear')
-
-    Restaurante.listar_restaurantes()
-
-    print('-' * 50)
-
-    restaurante1.listar_cardapio()
-
-if __name__ == '__main__':
-    main()
+    with open(file_name, 'w') as file:
+        json.dump(data, file, indent=4)
