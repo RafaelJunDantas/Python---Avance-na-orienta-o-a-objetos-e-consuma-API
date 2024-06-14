@@ -11,3 +11,6 @@ Ativar o ambiente virtual (Mac/Linux)
 
 Desativar o ambiente virtual
 - `deactivate`
+
+Subir o servidor com a API localmente
+- `uvicorn main:app -- reload`
